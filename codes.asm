@@ -11,7 +11,6 @@ LowRFrame equ 0beh
 
 VideoMemAddress equ 0b800h
 
-
 TitleLength equ 8d
 FrameLength equ 30d
 FrameHeight equ 10d
@@ -35,7 +34,6 @@ MagentaOnRed equ 4dh
 WhiteOnRed equ 4fh
 
 
-
-
-
-
+LenghtAddress equ 0h
+HeightAddress equ 1h
+ColorAddress equ 2h
