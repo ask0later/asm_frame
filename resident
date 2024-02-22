@@ -17,11 +17,12 @@ START:
 ControlStrArray db 0c9h, 0cdh, 0bbh, 0bah, 00h, 0bah, 0c8h, 0cdh, 0bch, '$'
 
 RegisterName db 'AX', 'BX', 'CX', 'DX', 'SI', 'DI', 'BP', 'DS', 'ES', 'SS', 'SP', 'IP', 'CS', '$'
+AddressSavesVideoMem dw 165 dup (0)
 
 OldValueAX dw 0, '$'
 OldValueSP dw 0, '$'
 
-HotKeyorNotHotKey db 0
+FrameFlag db 0
 
 
 
@@ -187,25 +188,25 @@ PrintHexNumber	proc
 				mov dx, bx
 
 				shr bh, 4
-				mov al, bh
+				mov al, bh							; first high 4 bit
 				call Converter
 				stosw								; mov word ptr es:[di], ax; di+=2
 
 				shl bh, 4
 				sub dh, bh
-				mov al, dh
+				mov al, dh							; second high 4 bit
 				call Converter
 				stosw								; mov word ptr es:[di], ax; di+=2
 
 
 				shr bl, 4
-				mov al, bl
+				mov al, bl							; first low 4 bit
 				call Converter
 				stosw								; mov word ptr es:[di], ax; di+=2
 
 				shl bl, 4
 				sub dl, bl
-				mov al, dl
+				mov al, dl							; second low 4 bit
 				call Converter
 				stosw								; mov word ptr es:[di], ax; di+=2
 
@@ -238,7 +239,7 @@ PrintRegister	proc
 				stosw								; mov word ptr es:[di], ax; di+=2
 
 				
-				mov bx, ss:[bp]						; bx = number that will be printed 
+				mov bx, [bp]						; bx = number that will be printed 
 				call PrintHexNumber					; print hex number
 
 				ret	
@@ -257,32 +258,34 @@ PrintRegister	proc
 PrintRegInfo 	proc
 			
 			push bp
-
 			mov bp, sp
-			add bp, 6d							; bp = sp + 6
+			add bp, 6d					; bp = sp + 6
+										; in stack (bp, ip_ret, ip_ret)
 
-			push 0b800h			; offset to video memory
+			push 0b800h					; offset to video memory
             pop es
 
+			
 			xor di, di
-			xor bp, bp
 			call PrintFrame
+
 
 			mov ah, WhiteOnMagenta
 			mov si, offset RegisterName
-			mov di, 164d		; = (80 + 2) * 2 next line and 2 symbol
+			mov di, 164d				; = (80 + 2) * 2 next line and 2 symbol
 			
-
-			mov cx, 13			; number of registers
+			
+			mov cx, 13					; number of registers
 			@@loop:
-				call PrintRegister			; fetches the register value from the stack 
-											; and writes it into the frame
+				call PrintRegister		; fetches the register value from the stack 
+										; and writes it into the frame
 				inc bp
 				inc bp
 
-				add di, 146d		; the length of the text about registers is 7 characters
-									; = 160 - 7 * 2 
+				add di, 146d			; the length of the text about registers is 7 characters
+										; = (80 - 7) * 2 
 			loop @@loop
+
 
 			pop bp
 
@@ -290,27 +293,122 @@ PrintRegInfo 	proc
 			endp
 ;----------------------------------------------------
 
+;----------------------------------------------------
+; removes the frame and fills the video memory 
+; with information from the array
+;
+; Destr: ax, bx, cx, dx, di, si
+;----------------------------------------------------
+RemoveFrame		proc
+
+				push cs
+				pop ds
+
+				xor di, di
+				xor dx, dx
+				xor cx, cx
+
+				mov si, offset AddressSavesVideoMem
+				push 0b800h
+				pop es
+				
+
+				@@loop_1:
+					cmp cx, FrameHeight
+					je @@exit_1
+					inc cx
+					
+					
+					@@loop_2:
+						cmp dx, FrameLength
+						je @@exit_2
+
+						mov ax, word ptr ds:[si]
+						mov word ptr es:[di], ax
+
+						add si, 2
+						add di, 2
+
+						inc dx
+						jmp @@loop_2
+
+					@@exit_2:
+					xor dx, dx
+					add di, 138d 				; (80 - 11) * 2
+
+					jmp @@loop_1
+				@@exit_1:
+
+				ret 
+				endp
+;----------------------------------------------------
+
+;----------------------------------------------------
+; saves information from video memory into an array
+;
+; Destr: ax, bx, cx, dx, di, si
+;----------------------------------------------------
+SaveVideoMem 	proc
+
+				push cs
+				pop ds
+
+				xor di, di
+				xor dx, dx
+				xor cx, cx
+
+				mov si, offset AddressSavesVideoMem
+				push 0b800h
+				pop es
+				
+
+				@@loop_1:
+					cmp cx, FrameHeight
+					je @@exit_1
+					inc cx
+					
+					
+					@@loop_2:
+						cmp dx, FrameLength
+						je @@exit_2
+
+						mov ax, word ptr es:[di]
+						mov word ptr ds:[si], ax
+
+						add si, 2
+						add di, 2
+
+						inc dx
+						jmp @@loop_2
+
+					@@exit_2:
+					xor dx, dx
+					add di, 138d 				; (80 - 11) * 2
+
+					jmp @@loop_1
+				@@exit_1:
+
+				ret 
+				endp
+
+				ret
+            	endp
+;----------------------------------------------------
 
 ;----------------------------------------------------
 ; the function supplements 
 ; the 8 (time) function 21 interrupts
-; Entry: 
-;		 
-;		 
-; Assumes: es - 0b800h
-; Destr: 
 ;----------------------------------------------------
 Int_08      proc
 			
 			push sp ss es ds bp di si dx cx bx ax
 			
-			mov al, cs:HotKeyorNotHotKey
+			mov al, cs:FrameFlag
 			cmp al, 1d
-			jne @@not_hot_key
+			jne @@exit
 			call PrintRegInfo
 							
-			@@not_hot_key:
-			
+			@@exit:
 			
 			pop ax bx cx dx si di bp ds es ss sp
 
@@ -326,24 +424,28 @@ old_int_08_seg    dw      0
 ;----------------------------------------------------
 ; the function supplements 
 ; the 9 (keybord) function 21 interrupts
-; Entry: 
-;		 
-;		 
-; Assumes: es - 0b800h
-; Destr: 
 ;----------------------------------------------------
 Int_09      proc
-			
+
 			push sp ss es ds bp di si dx cx bx ax
 
-
+			
             in al, 60h
-            cmp al, 0dh      	; '='
-            jne @@not_hot_key
-			call PrintRegInfo
-				xor cs:HotKeyorNotHotKey, 1d 
-			@@not_hot_key:
+            cmp al, 0dh      				; '='
+            jne @@exit
+			mov al, cs:FrameFlag			; need update or not
+			cmp al, 1d
+			je @@remove_frame
+				xor cs:FrameFlag, 1d
+				call SaveVideoMem
+				call PrintRegInfo
+				jmp @@exit
+			@@remove_frame:
+				xor cs:FrameFlag, 1d
+				call RemoveFrame	
+			@@exit:
 
+			
 
 			pop ax bx cx dx si di bp ds es ss sp
 			
@@ -367,11 +469,10 @@ Main:		nop
 
             mov ax, 3509h
             int 21h
-
             mov old_int_09_ofs, bx
             mov bx, es
-            mov old_int_09_seg, bx			; save old address of interupt function 09h
-											; keybord
+            mov old_int_09_seg, bx		; save old address of interupt function 09h
+										; keybord
 
             mov bx, 4 * 09h  			
 			push 0
@@ -379,16 +480,15 @@ Main:		nop
 
 
             cli
-            mov es:[bx], offset Int_09		; 0:[4 * 09h] = address of Int_09
+            mov es:[bx], offset Int_09	; 0:[4 * 09h] = address of Int_09
             push cs
             pop ax
-            mov es:[bx + 2], ax				; 0:[4 * 09h] = cs
+            mov es:[bx + 2], ax			; 0:[4 * 09h] = cs
             sti
 
 
 			mov ax, 3508h
             int 21h
-
             mov old_int_08_ofs, bx
             mov bx, es
             mov old_int_08_seg, bx      ; save old address of interupt function 08h
@@ -405,8 +505,6 @@ Main:		nop
             pop ax
             mov es:[bx + 2], ax			; 0:[4 * 08h] = cs
             sti
-
-			
 
 
             mov ax, 3100h
