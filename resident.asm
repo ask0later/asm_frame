@@ -61,9 +61,8 @@ PrintLine	proc
 
 			stosw								; mov ptr word es:[di], ax
 
-			dec si
-			dec si
-			dec si								; si = start of style array
+	
+			sub si, 3d							; si = start of style array
 
 			ret
 			endp
@@ -140,9 +139,7 @@ PrintFrame		proc
 			call PrintLine
 			call NewLine			
 			
-			inc si
-			inc si
-			inc si
+			add si, 3d
 
 			mov cx, dx
 			dec cx
@@ -157,16 +154,12 @@ PrintFrame		proc
 			pop cx
 			loop @@loop
 
-			inc si
-			inc si
-			inc si
+			add si, 3d
 
 			call PrintLine
 			call NewLine
 
-			inc si
-			inc si
-			inc si
+			add si, 3d
 
 			pop bx
 			pop dx
