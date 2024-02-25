@@ -16,12 +16,12 @@ START:
 				; array with frame edge symbols
 ControlStrArray db 0dah, 0c4h, 0bfh, 0b3h, 00h, 0b3h, 0c0h, 0c4h, 0d9h, 0c9h, 0cdh, 0bbh, 0bah, 00h, 0bah, 0c8h, 0cdh, 0bch, '$'
 
+				; an array into which you can write information and not corrupt someone else's information
 FreeMemory db 100 dup(0), '$'
 
-EmptyMemory db 10 dup(0), '$'
 
 ;----------------------------------------------------
-; Skips gaps in memory es:[di] by adding register di
+; Skips gaps in memory ds:[si] by adding register si
 ; Entry: 
 ;		 ds - data segment
 ;	 	 si - offset ds
