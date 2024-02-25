@@ -501,9 +501,10 @@ Main:
 
             mov ax, 3100h				; puts the program in memory
             
-            mov dx, offset EOP
-            shr dx, 4
-            inc dx
+            mov dx, offset EOP			;
+            shr dx, 4					;
+            inc dx						; numbers of paragraph = all byte of program / 4
+										; sizeof paragraph = 4 
 
             int 21h
 		
