@@ -303,7 +303,7 @@ RemoveFrame		proc
 				xor cx, cx
 
 				mov si, offset AddressSavesVideoMem
-				push 0b800h
+				push VideoMemAddress			
 				pop es							; es = video memory
 				
 
@@ -352,7 +352,7 @@ SaveVideoMem 	proc
 				xor cx, cx
 
 				mov si, offset AddressSavesVideoMem
-				push 0b800h
+				push VideoMemAddress
 				pop es							; es = video memory
 				
 
