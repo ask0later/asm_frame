@@ -13,15 +13,16 @@ START:
 		jmp Main
 		
 ;----------------------------------------------------
-																		;
+			; array with frame edge symbols
 ControlStrArray db 0c9h, 0cdh, 0bbh, 0bah, 00h, 0bah, 0c8h, 0cdh, 0bch, '$'
 
+			; names of registers
 RegisterName db 'AX', 'BX', 'CX', 'DX', 'SI', 'DI', 'BP', 'DS', 'ES', 'SS', 'SP', 'IP', 'CS', '$'
+
+			; address, where save data of video memory under frame
 AddressSavesVideoMem dw 165 dup (0)
 
-OldValueAX dw 0, '$'
-OldValueSP dw 0, '$'
-
+			; update_frame flag 
 FrameFlag db 0
 
 
