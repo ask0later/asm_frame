@@ -464,9 +464,7 @@ old_int_09_seg    dw      0
 ; Assumes:
 ; Destr: ax, bx, cx, dx, di
 ;----------------------------------------------------
-Main:		nop
-
-
+Main:		
             mov ax, 3509h				; bx = offset; es = segment of address function 09h
             int 21h						;
             mov old_int_09_ofs, bx
