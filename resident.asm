@@ -406,7 +406,7 @@ Int_08      proc
 			
 			pop ax bx cx dx si di bp ds es ss sp
 
-            	  db 	  0eah
+            	  db 	  0eah				; far jump to olf int_08
 old_int_08_ofs    dw      0
 old_int_08_seg    dw      0
 
@@ -443,7 +443,7 @@ Int_09      proc
 
 			pop ax bx cx dx si di bp ds es ss sp
 			
-            	  db 	  0eah
+            	  db 	  0eah				; far jump to olf int_09
 old_int_09_ofs    dw      0
 old_int_09_seg    dw      0
 
