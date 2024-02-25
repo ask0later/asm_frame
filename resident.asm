@@ -430,7 +430,7 @@ Int_09      proc
 			push sp ss es ds bp di si dx cx bx ax
 
 			
-            in al, 60h						
+            in al, 60h						; keyboard ports
             cmp al, 0dh      				; '='
             jne @@exit
 			mov al, cs:FrameFlag			; need update or not
