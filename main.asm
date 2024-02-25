@@ -55,11 +55,7 @@ SkipSpaces	proc
 ;		 [FreeMemory + TextAddress + 1]  = ptr text
 ;
 ; Assumes: Title : text_in_frame
-;		   cx decreases 
-;		   ds - data segment
-;		   ds:[81h] - command line start address
-;		   ds:[80h] - address the number 
-;          of entered characters in the command line
+;		   cx decreases
 ; Destr: ax, di, si
 ;---------------------------------------------------
 ParseText	proc
@@ -124,6 +120,7 @@ ParseText	proc
 ;		   *_________ - users style
 ;		   01 - address of ControlStrArray
 ;		   02 - address of ControlStrArray + 9
+;		   cx decreases
 ; Destr: ax, bx, si, cx, bp
 ;---------------------------------------------------
 ParseStyle	proc
