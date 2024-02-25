@@ -76,15 +76,14 @@ ParseText	proc
 			push di
 			xor di, di
 
-			mov al, ':'					
-
+			mov al, ':'								;
 			@@loop_1:
 				inc di								; characters count 
 				inc si								;
 				dec cx								;
 				cmp al, ds:[si]						;
 				jne @@loop_1						;
-
+													; finded ':' or cx == 0
 			inc si
 			dec cx
 
@@ -275,6 +274,7 @@ ParseNumber	proc
 ;		   ds:[81h] - command line start address
 ;		   ds:[80h] - address the number 
 ;          of entered characters in the command line
+;		   cx - counter with start value = number of character of com line
 ; Destr: ax, bx, cx, si, di 
 ;----------------------------------------------------
 ParseCommandLine	proc
