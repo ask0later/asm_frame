@@ -430,7 +430,7 @@ Int_09      proc
 			push sp ss es ds bp di si dx cx bx ax
 
 			
-            in al, 60h
+            in al, 60h						
             cmp al, 0dh      				; '='
             jne @@exit
 			mov al, cs:FrameFlag			; need update or not
@@ -467,14 +467,14 @@ old_int_09_seg    dw      0
 Main:		nop
 
 
-            mov ax, 3509h
-            int 21h
+            mov ax, 3509h				; bx = offset; es = segment of address function 09h
+            int 21h						;
             mov old_int_09_ofs, bx
             mov bx, es
             mov old_int_09_seg, bx		; save old address of interupt function 09h
 										; keybord
 
-            mov bx, 4 * 09h  			
+            mov bx, 4 * 09h  			; 4 * 09h = addres Int_09
 			push 0
             pop es
 
@@ -487,14 +487,14 @@ Main:		nop
             sti
 
 
-			mov ax, 3508h
-            int 21h
+			mov ax, 3508h				; bx = offset; es = segment of address function 08h
+            int 21h						;
             mov old_int_08_ofs, bx
             mov bx, es
             mov old_int_08_seg, bx      ; save old address of interupt function 08h
                       					; time
 
-            mov bx, 4 * 08h  
+            mov bx, 4 * 08h  			; 4 * 08h = addres Int_08
       		push 0
             pop es
 
