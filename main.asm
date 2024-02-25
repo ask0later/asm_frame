@@ -691,8 +691,8 @@ Main:
 			call PrintFrame
 			call PrintShadow
 
-			mov ax, 4c01h
-			int 21h
+			mov ax, 4c01h		; function of exit
+			int 21h			; interupt
 		
 ;----------------------------------------------------
 
