@@ -191,7 +191,7 @@ ParseColor	proc
 			
 
 			shl al, 4					; al = al * 16
-			
+										; put the first hex number in the first 4 bits of 1 byte
 			mov bl, ds:[si]				;
 
 			inc si
@@ -207,6 +207,7 @@ ParseColor	proc
 			@@digit_2:					; }
 			
 			add al, bl					; al = attribute hex
+										; put the second hex number in the second 4 bits of 1 byte
 
 			mov ds:[di + FreeMemory], al  	; into free memory
 
@@ -357,6 +358,7 @@ PrintLine	proc
 ; Destr: di
 ;----------------------------------------------------
 NewLine		proc
+			nop 
 			
 			add di, LineLength * 2
 			shl bx, 1
@@ -677,7 +679,7 @@ PrintShadow	proc
 ; Assumes:
 ; Destr: ax, bx, cx, dx, di
 ;----------------------------------------------------
-Main:
+Main:		nop
 			mov bx, VideoMemAddress	; = 0b800h
 			mov es, bx				; es = video mem address
 
@@ -691,8 +693,8 @@ Main:
 			call PrintFrame
 			call PrintShadow
 
-			mov ax, 4c01h		; function of exit
-			int 21h			; interupt
+			mov ax, 4c01h
+			int 21h
 		
 ;----------------------------------------------------
 
