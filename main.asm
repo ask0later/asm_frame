@@ -279,8 +279,8 @@ ParseCommandLine	proc
 					xor cx, cx
 					xor ax, ax
 
-					mov byte ptr cl, ds:[0080h]		; cl = nubmer of characher on com line
-					mov si, offset [81h]			; si = ptr on first char on com line
+					mov byte ptr cl, ds:[PtrCommmandLine]	; cl = nubmer of characher on com line
+					mov si, offset [PtrCommmandLine + 1h]	; si = ptr on first char on com line
 
 					call SkipSpaces					
 					mov di, LenghtAddress			; number is length
@@ -357,7 +357,6 @@ PrintLine	proc
 ; Destr: di
 ;----------------------------------------------------
 NewLine		proc
-			nop 
 			
 			add di, LineLength * 2
 			shl bx, 1
@@ -678,7 +677,7 @@ PrintShadow	proc
 ; Assumes:
 ; Destr: ax, bx, cx, dx, di
 ;----------------------------------------------------
-Main:		nop
+Main:
 			mov bx, VideoMemAddress	; = 0b800h
 			mov es, bx				; es = video mem address
 
