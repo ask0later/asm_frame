@@ -304,7 +304,7 @@ RemoveFrame		proc
 
 				mov si, offset AddressSavesVideoMem
 				push 0b800h
-				pop es
+				pop es							; es = video memory
 				
 
 				@@loop_1:
@@ -317,7 +317,7 @@ RemoveFrame		proc
 						cmp dx, FrameLength
 						je @@exit_2
 
-						mov ax, word ptr ds:[si]
+						mov ax, word ptr ds:[si] 	; puts from array to video memory
 						mov word ptr es:[di], ax
 
 						add si, 2
@@ -353,7 +353,7 @@ SaveVideoMem 	proc
 
 				mov si, offset AddressSavesVideoMem
 				push 0b800h
-				pop es
+				pop es							; es = video memory
 				
 
 				@@loop_1:
@@ -366,7 +366,7 @@ SaveVideoMem 	proc
 						cmp dx, FrameLength
 						je @@exit_2
 
-						mov ax, word ptr es:[di]
+						mov ax, word ptr es:[di]	; save from video mem to array
 						mov word ptr ds:[si], ax
 
 						add si, 2
